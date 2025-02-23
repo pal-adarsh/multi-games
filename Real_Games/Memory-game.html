@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Memory Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    background-color: #0d0d0d;
+    color: cyan;
+    text-align: center;
+}
+
+h1 {
+    font-size: 36px;
+    text-shadow: 0 0 10px cyan, 0 0 20px cyan;
+    margin-bottom: 20px;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 0 15px cyan;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.info {
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: cyan;
+    color: black;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 0 15px cyan;
+    transition: 0.3s;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: lime;
+    box-shadow: 0 0 15px lime;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 80px);
+    grid-template-rows: repeat(4, 80px);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.card {
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    border-radius: 10px;
+    perspective: 1000px;
+    position: relative;
+}
+
+.card-inner {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+}
+
+.card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+.card .front,
+.card .back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: bold;
+    border-radius: 10px;
+    box-shadow: 0 0 10px cyan;
+}
+
+.card .front {
+    background-color: cyan;
+}
+
+.card .back {
+    background-color: black;
+    color: cyan;
+    text-shadow: 0 0 10px cyan;
+    transform: rotateY(180deg);
+}
+
+/* Matched cards */
+.card.matched .card-inner {
+    background-color: lime;
+    box-shadow: 0 0 15px lime;
+    color: black;
+}
+
+/* Confetti animation */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Neon Memory Game</h1>
+        <div class="info">
+            <button id="restart-btn">Restart</button>
+            <button id="pause-btn">Pause</button>
+            <p>Time: <span id="timer">00:00</span></p>
+            <p>Moves: <span id="move-counter">0</span></p>
+        </div>
+        <div id="game-board" class="game-board"></div>
+    </div>
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    const board = document.getElementById('game-board');
+    const timerDisplay = document.getElementById('timer');
+    const moveCounterDisplay = document.getElementById('move-counter');
+    const restartButton = document.getElementById('restart-btn');
+    const pauseButton = document.getElementById('pause-btn');
+
+    let cards = [];
+    let firstCard = null, secondCard = null;
+    let lockBoard = false;
+    let matchedCount = 0;
+    let moveCount = 0;
+    let timer;
+    let seconds = 0;
+    let isPaused = false;
+
+    function generateCards() {
+        const cardPairs = 8;
+        const cardNumbers = [];
+        for (let i = 1; i <= cardPairs; i++) {
+            cardNumbers.push(i.toString(), i.toString());
+        }
+        return cardNumbers;
+    }
+
+    function shuffle(array) {
+        array.sort(() => 0.5 - Math.random());
+    }
+
+    function renderBoard() {
+        cards = generateCards();
+        shuffle(cards);
+        board.innerHTML = '';
+        matchedCount = 0;
+        moveCount = 0;
+        moveCounterDisplay.textContent = moveCount;
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
+
+        cards.forEach((cardValue) => {
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.dataset.card = cardValue;
+
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="front"></div>
+                    <div class="back">${cardValue}</div>
+                </div>
+            `;
+
+            card.addEventListener('click', flipCard);
+            board.appendChild(card);
+        });
+
+        board.style.gridTemplateColumns = `repeat(4, 80px)`;
+    }
+
+    function startTimer() {
+        seconds = 0;
+        clearInterval(timer);
+        timer = setInterval(() => {
+            if (!isPaused) {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const displaySeconds = seconds % 60;
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
+    }
+
+    function flipCard() {
+        if (lockBoard || this.classList.contains('flipped') || isPaused) return;
+        if (this === firstCard) return;
+
+        this.classList.add('flipped');
+
+        if (!firstCard) {
+            firstCard = this;
+            return;
+        }
+
+        secondCard = this;
+        moveCount++;
+        moveCounterDisplay.textContent = moveCount;
+
+        checkForMatch();
+    }
+
+    function checkForMatch() {
+        if (!firstCard || !secondCard) return;
+        lockBoard = true;
+
+        const isMatch = firstCard.dataset.card === secondCard.dataset.card;
+
+        if (isMatch) {
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+            matchedCount += 2;
+
+            if (matchedCount === cards.length) {
+                setTimeout(() => {
+                    alert(`🎉 You won in ${moveCount} moves and ${timerDisplay.textContent}!`);
+                    clearInterval(timer);
+                    confetti();
+                }, 500);
+            }
+
+            resetBoard();
+        } else {
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                resetBoard();
+            }, 1000);
+        }
+    }
+
+    function resetBoard() {
+        [firstCard, secondCard] = [null, null];
+        lockBoard = false;
+    }
+
+    restartButton.addEventListener('click', () => {
+        renderBoard();
+        startTimer();
+    });
+
+    pauseButton.addEventListener('click', () => {
+        isPaused = !isPaused;
+        pauseButton.textContent = isPaused ? 'Resume' : 'Pause';
+    });
+
+    renderBoard();
+    startTimer();
+});
+
+    </script>
+</body>
+</html>

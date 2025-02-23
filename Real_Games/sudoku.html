@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Sudoku Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+body {
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+    background-color: #0d0d0d;
+    color: cyan;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 36px;
+    text-shadow: 0 0 10px cyan, 0 0 20px cyan;
+    margin-bottom: 20px;
+}
+
+#sudoku-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px auto;
+}
+
+table {
+    border-collapse: collapse;
+    box-shadow: 0 0 15px cyan;
+}
+
+td {
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    border: 2px solid cyan;
+    box-shadow: inset 0 0 10px cyan;
+    position: relative;
+}
+
+input {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    border: none;
+    font-size: 20px;
+    background: black;
+    color: cyan;
+    font-family: 'Orbitron', sans-serif;
+    outline: none;
+    box-shadow: inset 0 0 10px cyan;
+}
+
+input:disabled {
+    background: rgba(0, 255, 255, 0.2);
+    color: lime;
+}
+
+#controls {
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: cyan;
+    color: black;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 0 15px cyan;
+    transition: 0.3s;
+    margin: 10px;
+}
+
+button:hover {
+    background-color: lime;
+    box-shadow: 0 0 15px lime;
+}
+
+#stopwatch {
+    margin-top: 20px;
+    font-size: 20px;
+    text-shadow: 0 0 10px cyan;
+}
+
+#stopwatch button {
+    margin-left: 10px;
+}
+
+    </style>
+</head>
+<body>
+    <h1>Neon Sudoku</h1>
+    <div id="sudoku-container">
+        <table id="sudoku-grid"></table>
+    </div>
+    
+    <div id="controls">
+        <button id="solveButton">Solve</button>
+        <button id="resetButton">Reset</button>
+        <div id="stopwatch">
+            <span id="time">00:00</span>
+            <button id="stopwatchButton">Start</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let stopwatchInterval;
+let stopwatchSeconds = 0;
+
+document.addEventListener("DOMContentLoaded", () => {
+    createSudokuGrid();
+    document.getElementById("solveButton").addEventListener("click", solveSudoku);
+    document.getElementById("resetButton").addEventListener("click", resetGame);
+    document.getElementById("stopwatchButton").addEventListener("click", toggleStopwatch);
+});
+
+function createSudokuGrid() {
+    const gridSize = 9;
+    const sudokuGrid = document.getElementById("sudoku-grid");
+    sudokuGrid.innerHTML = "";
+    const initialNumbers = generateInitialNumbers();
+
+    for (let i = 0; i < gridSize; i++) {
+        const row = document.createElement("tr");
+        for (let j = 0; j < gridSize; j++) {
+            const cell = document.createElement("td");
+            const input = document.createElement("input");
+            input.type = "number";
+            input.min = 1;
+            input.max = 9;
+            input.id = `cell-${i}-${j}`;
+            cell.appendChild(input);
+            row.appendChild(cell);
+
+            if (initialNumbers[i][j] !== 0) {
+                input.value = initialNumbers[i][j];
+                input.disabled = true;
+            }
+        }
+        sudokuGrid.appendChild(row);
+    }
+}
+
+function generateInitialNumbers() {
+    const gridSize = 9;
+    const initialNumbers = Array.from({ length: gridSize }, () => Array(gridSize).fill(0));
+
+    for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+            if (Math.random() > 0.5) {
+                initialNumbers[i][j] = Math.floor(Math.random() * 9) + 1;
+            }
+        }
+    }
+    return initialNumbers;
+}
+
+function solveSudoku() {
+    for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+            const cell = document.getElementById(`cell-${i}-${j}`);
+            if (!cell.disabled) {
+                cell.value = (i * 9 + j) % 9 + 1;
+            }
+        }
+    }
+}
+
+function resetGame() {
+    createSudokuGrid();
+    stopwatchSeconds = 0;
+    document.getElementById("time").textContent = "00:00";
+    clearInterval(stopwatchInterval);
+    stopwatchInterval = null;
+    document.getElementById("stopwatchButton").textContent = "Start";
+}
+
+function toggleStopwatch() {
+    const button = document.getElementById("stopwatchButton");
+    if (stopwatchInterval) {
+        clearInterval(stopwatchInterval);
+        stopwatchInterval = null;
+        button.textContent = "Start";
+    } else {
+        stopwatchInterval = setInterval(updateStopwatch, 1000);
+        button.textContent = "Stop";
+    }
+}
+
+function updateStopwatch() {
+    stopwatchSeconds++;
+    const minutes = Math.floor(stopwatchSeconds / 60);
+    const seconds = stopwatchSeconds % 60;
+    document.getElementById("time").textContent = `${pad(minutes)}:${pad(seconds)}`;
+}
+
+function pad(number) {
+    return number < 10 ? "0" + number : number;
+}
+
+    </script>
+</body>
+</html>

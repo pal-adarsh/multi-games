@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Playgame</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+body {
+    background-color: #0d0d0d;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    margin: 0;
+}
+
+header {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 15px cyan;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    background: #111;
+    list-style: none;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: cyan;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    color: lime;
+}
+
+.hero {
+    padding: 50px;
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 20px cyan;
+}
+
+.games-container, .about, .contact {
+    padding: 40px;
+}
+
+.game-card {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 20px;
+    width: 250px;
+    display: inline-block;
+    margin: 15px;
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    transition: 0.3s;
+}
+
+.game-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px cyan;
+}
+
+.play-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    color: black;
+    background: cyan;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.play-btn:hover {
+    background: lime;
+    box-shadow: 0 0 10px lime;
+}
+
+footer {
+    padding: 20px;
+    background: #111;
+    color: cyan;
+    box-shadow: 0 -5px 10px cyan;
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Neon Playgame</h1>
+        <p>Play multiple games anytime and have fun!</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <section id="home" class="hero">
+        <h2>Welcome to the Future of Gaming</h2>
+        <p>Dive into a collection of exciting and challenging games!</p>
+        <a href="#games" class="play-btn">Explore Games</a>
+    </section>
+
+    <section id="about" class="about">
+        <h2>About Neon Playgame</h2>
+        <p>Neon Playgame is a hub for exciting and brain-teasing games. Whether you want to test your reflexes or challenge your logic, we have something for you!</p>
+    </section>
+
+    <section id="games" class="games-container">
+        <h2>Popular Games</h2>
+        <div class="game-card">
+            <h3>Whack a Mole</h3>
+            <p>Test your reflexes in this classic game.</p>
+            <a href="/Real_Games/whack-a-mole.html" class="play-btn">Play</a>
+        </div>
+
+        <div class="game-card">
+            <h3>Typing Speed</h3>
+            <p>Improve your typing speed with fun challenges.</p>
+            <a href="/Real_Games/typing-speed.html" class="play-btn" >Play</a>
+        </div>
+
+        <div class="game-card">
+            <h3>Sudoku</h3>
+            <p>Challenge your brain with Sudoku puzzles.</p>
+            <a href="Real_Games/sudoku.html" class="play-btn">Play</a>
+        </div>
+
+        <div class="game-card">
+            <h3>2048</h3>
+            <p>Slide and combine tiles to reach 2048.</p>
+            <a href="/Real_Games/2048.html" class="play-btn" target="_blank">Play</a>
+        </div>
+
+        <div class="game-card">
+            <h3>Snake Game</h3>
+            <p>Feed the snake to make it large</p>
+            <a href="/Real_Games/snake.html" class="play-btn" target="_blank">Play</a>
+        </div>
+
+        <div class="game-card">
+            <h3>Memory Game</h3>
+            <p>Watch and Remember</p>
+            <a href="/Real_Games/Memory-game.html" class="play-btn" target="_blank">Play</a>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <h2>Contact Us</h2>
+        <p>Have a game suggestion or feedback? Get in touch!</p>
+        <a href="mailto:guptaankita33324@gmail.com" class="play-btn">Email Us</a>
+    </section>
+    
+
+    <footer>
+        <p>&copy; 2025 Neon Playgame. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        document.querySelectorAll('.play-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        alert(`Redirecting to ${this.innerText}...`);
+    });
+});
+
+    </script>
+</body>
+</html>
