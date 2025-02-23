@@ -32,4 +32,4 @@ Welcome to **Neon Playgame**, a **visually stunning** collection of classic web 
 ## **📥 Installation & Setup**
 1. **Clone the repository**  
    ```sh
-   git clone https://github.com/YOUR-GITHUB-USERNAME/neon-playgame.git
+   git clone https://github.com/pal-adarsh/multi-games.git
