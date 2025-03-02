@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Typing Speed Test</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+        body {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            background-color: #0d0d0d;
+            color: cyan;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px cyan;
+            width: 80%;
+            margin: auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            text-shadow: 0 0 10px cyan, 0 0 20px cyan;
+        }
+
+        #wordDisplay {
+            font-size: 22px;
+            font-weight: bold;
+            text-shadow: 0 0 10px cyan;
+            margin: 20px 0;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            background: black;
+            color: cyan;
+            border: 2px solid cyan;
+            box-shadow: 0 0 10px cyan;
+        }
+
+        .buttons {
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            font-family: 'Orbitron', sans-serif;
+            background-color: cyan;
+            color: black;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 0 15px cyan;
+            transition: 0.3s;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: lime;
+            box-shadow: 0 0 15px lime;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        #progressBar {
+            width: 100%;
+            height: 100%;
+            background: cyan;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        #result {
+            font-size: 18px;
+            text-shadow: 0 0 10px cyan;
+        }
+
+        h2 {
+            font-size: 24px;
+            text-shadow: 0 0 10px cyan;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Neon Typing Speed Test</h1>
+        <p id="wordDisplay">Press "Start" to begin typing!</p>
+        <textarea id="textInput" placeholder="Start typing here..." disabled></textarea>
+
+        <div class="buttons">
+            <button id="startButton">Start</button>
+        </div>
+
+        <div class="progress-container">
+            <div id="progressBar"></div>
+        </div>
+
+        <div id="result">
+            <p>Time: <span id="time">60</span> sec</p>
+            <p>Words Typed: <span id="wordsTyped">0</span></p>
+            <p>Accuracy: <span id="accuracy">0</span>%</p>
+            <p>WPM: <span id="wpm">0</span></p>
+            <p><strong>Highest WPM: <span id="highScore">0</span></strong></p>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 60;
+        let wordsTyped = 0;
+        let correctChars = 0;
+        let totalChars = 0;
+        let interval;
+        let gameStarted = false;
+
+        const sentences = [
+            "The neon lights glow in the dark city.",
+            "Hackers move through cyberspace undetected.",
+            "The future of gaming is bright and digital.",
+            "Artificial intelligence is shaping tomorrow.",
+            "Code is like poetry, precise and elegant.",
+            "A keyboard and a dream can change the world.",
+            "Technology advances with every passing second.",
+            "Typing speed is a skill that improves with practice.",
+            "The matrix is a system, a digital playground.",
+            "Cybersecurity is essential in the modern world."
+        ];
+
+        const wordDisplay = document.getElementById("wordDisplay");
+        const textInput = document.getElementById("textInput");
+        const startButton = document.getElementById("startButton");
+        const timeDisplay = document.getElementById("time");
+        const wordsTypedDisplay = document.getElementById("wordsTyped");
+        const accuracyDisplay = document.getElementById("accuracy");
+        const wpmDisplay = document.getElementById("wpm");
+        const highScoreDisplay = document.getElementById("highScore");
+        const progressBar = document.getElementById("progressBar");
+
+        let highScore = localStorage.getItem("highScore") || 0;
+        highScoreDisplay.textContent = highScore;
+
+        function getRandomSentence() {
+            return sentences[Math.floor(Math.random() * sentences.length)];
+        }
+
+        function startGame() {
+            gameStarted = true;
+            startButton.disabled = true;
+            textInput.disabled = false;
+            textInput.value = "";
+            wordDisplay.textContent = getRandomSentence();
+
+            timeLeft = 60;
+            wordsTyped = 0;
+            correctChars = 0;
+            totalChars = 0;
+            progressBar.style.width = "100%";
+
+            interval = setInterval(updateTime, 1000);
+        }
+
+        function updateTime() {
+            timeLeft--;
+            timeDisplay.textContent = timeLeft;
+            progressBar.style.width = `${(timeLeft / 60) * 100}%`;
+
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                textInput.disabled = true;
+                gameStarted = false;
+                calculateWPM();
+                alert("Time's up! Your typing test is over.");
+            }
+        }
+
+        function calculateWPM() {
+            let minutes = 1;
+            let wpm = wordsTyped / minutes;
+            let accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 0;
+
+            wpmDisplay.textContent = Math.round(wpm);
+            accuracyDisplay.textContent = accuracy;
+
+            if (wpm > highScore) {
+                highScore = Math.round(wpm);
+                localStorage.setItem("highScore", highScore);
+                highScoreDisplay.textContent = highScore;
+            }
+        }
+
+        textInput.addEventListener("input", function () {
+            let currentText = textInput.value;
+            let expectedText = wordDisplay.textContent;
+
+            totalChars = expectedText.length;
+            correctChars = 0;
+
+            for (let i = 0; i < currentText.length; i++) {
+                if (currentText[i] === expectedText[i]) {
+                    correctChars++;
+                }
+            }
+
+            if (currentText === expectedText) {
+                wordsTyped += expectedText.split(" ").length;
+                wordsTypedDisplay.textContent = wordsTyped;
+                textInput.value = "";
+                wordDisplay.textContent = getRandomSentence();
+            }
+        });
+
+        textInput.addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                wordsTyped += wordDisplay.textContent.split(" ").length;
+                wordsTypedDisplay.textContent = wordsTyped;
+                textInput.value = "";
+                wordDisplay.textContent = getRandomSentence();
+            }
+        });
+
+        startButton.addEventListener("click", startGame);
+    </script>
+</body>
+</html>
