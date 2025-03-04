@@ -31,21 +31,35 @@
         }
 
         #wordDisplay {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
             text-shadow: 0 0 10px cyan;
             margin: 20px 0;
+            text-align: left;
+            line-height: 1.5;
+            padding: 10px;
+            border: 2px solid cyan;
+            border-radius: 5px;
         }
 
         textarea {
             width: 100%;
+            height: 120px;
+            font-size: 16px;
+            font-family: 'Orbitron', sans-serif;
             padding: 10px;
-            font-size: 18px;
-            border-radius: 5px;
+            border: 2px solid cyan;
             background: black;
             color: cyan;
-            border: 2px solid cyan;
+            outline: none;
+            resize: none;
+            border-radius: 5px;
             box-shadow: 0 0 10px cyan;
+        }
+
+        textarea:focus {
+            border-color: lime;
+            box-shadow: 0 0 15px lime;
         }
 
         .buttons {
@@ -55,7 +69,6 @@
         button {
             padding: 10px 20px;
             font-size: 18px;
-            font-family: 'Orbitron', sans-serif;
             background-color: cyan;
             color: black;
             border: none;
@@ -102,11 +115,20 @@
 <body>
     <div class="container">
         <h1>Neon Typing Speed Test</h1>
-        <p id="wordDisplay">Press "Start" to begin typing!</p>
+
+        <!-- Scoreboard -->
+        <div id="scoreBoard">
+            <p>WPM: <span id="wpm">0</span> | Best WPM: <span id="typingHighScore">0</span></p>
+        </div>
+
+        <p id="wordDisplay"></p>
         <textarea id="textInput" placeholder="Start typing here..." disabled></textarea>
 
         <div class="buttons">
+            <a href="../index2.html"><button>Home</button></a>
             <button id="startButton">Start</button>
+            <button id="pauseButton">Pause</button>
+            <button id="restartButton">Restart</button>
         </div>
 
         <div class="progress-container">
@@ -114,11 +136,10 @@
         </div>
 
         <div id="result">
-            <p>Time: <span id="time">60</span> sec</p>
-            <p>Words Typed: <span id="wordsTyped">0</span></p>
+            
+            <p>Time Left: <span id="time">60</span> sec</p>
+            <p>Words per minute: <span id="wordsTyped">0</span></p>
             <p>Accuracy: <span id="accuracy">0</span>%</p>
-            <p>WPM: <span id="wpm">0</span></p>
-            <p><strong>Highest WPM: <span id="highScore">0</span></strong></p>
         </div>
     </div>
 
@@ -128,115 +149,108 @@
         let correctChars = 0;
         let totalChars = 0;
         let interval;
-        let gameStarted = false;
-
-        const sentences = [
-            "The neon lights glow in the dark city.",
-            "Hackers move through cyberspace undetected.",
-            "The future of gaming is bright and digital.",
-            "Artificial intelligence is shaping tomorrow.",
-            "Code is like poetry, precise and elegant.",
-            "A keyboard and a dream can change the world.",
-            "Technology advances with every passing second.",
-            "Typing speed is a skill that improves with practice.",
-            "The matrix is a system, a digital playground.",
-            "Cybersecurity is essential in the modern world."
-        ];
+        let isPaused = false;
+        let typingHighScore = localStorage.getItem("typingHighScore") || 0;
+        document.getElementById("typingHighScore").textContent = typingHighScore;
 
         const wordDisplay = document.getElementById("wordDisplay");
         const textInput = document.getElementById("textInput");
         const startButton = document.getElementById("startButton");
+        const pauseButton = document.getElementById("pauseButton");
+        const restartButton = document.getElementById("restartButton");
         const timeDisplay = document.getElementById("time");
         const wordsTypedDisplay = document.getElementById("wordsTyped");
         const accuracyDisplay = document.getElementById("accuracy");
         const wpmDisplay = document.getElementById("wpm");
-        const highScoreDisplay = document.getElementById("highScore");
         const progressBar = document.getElementById("progressBar");
 
-        let highScore = localStorage.getItem("highScore") || 0;
-        highScoreDisplay.textContent = highScore;
+        const paragraph = "The neon lights glow in the dark city. Hackers move through cyberspace undetected. The future of gaming is bright and digital. Artificial intelligence is shaping tomorrow. Code is like poetry, precise and elegant.";
 
-        function getRandomSentence() {
-            return sentences[Math.floor(Math.random() * sentences.length)];
-        }
+        wordDisplay.textContent = paragraph;
 
         function startGame() {
-            gameStarted = true;
-            startButton.disabled = true;
             textInput.disabled = false;
             textInput.value = "";
-            wordDisplay.textContent = getRandomSentence();
-
+            textInput.focus();
             timeLeft = 60;
             wordsTyped = 0;
             correctChars = 0;
-            totalChars = 0;
+            totalChars = paragraph.length;
             progressBar.style.width = "100%";
+            isPaused = false;
+            startButton.disabled = true;
 
             interval = setInterval(updateTime, 1000);
         }
 
-        function updateTime() {
-            timeLeft--;
-            timeDisplay.textContent = timeLeft;
-            progressBar.style.width = `${(timeLeft / 60) * 100}%`;
-
-            if (timeLeft <= 0) {
+        function pauseGame() {
+            if (!isPaused) {
                 clearInterval(interval);
+                isPaused = true;
+                pauseButton.innerText = "Resume";
                 textInput.disabled = true;
-                gameStarted = false;
-                calculateWPM();
-                alert("Time's up! Your typing test is over.");
+            } else {
+                isPaused = false;
+                pauseButton.innerText = "Pause";
+                interval = setInterval(updateTime, 1000);
+                textInput.disabled = false;
+                textInput.focus();
+            }
+        }
+
+        function restartGame() {
+            clearInterval(interval);
+            textInput.disabled = true;
+            textInput.value = "";
+            wpmDisplay.textContent = "0";
+            wordsTypedDisplay.textContent = "0";
+            accuracyDisplay.textContent = "0";
+            timeDisplay.textContent = "60";
+            progressBar.style.width = "100%";
+            isPaused = false;
+            pauseButton.innerText = "Pause";
+            startButton.disabled = false;
+        }
+
+        function updateTime() {
+            if (!isPaused) {
+                timeLeft--;
+                timeDisplay.textContent = timeLeft;
+                progressBar.style.width = `${(timeLeft / 60) * 100}%`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    textInput.disabled = true;
+                    calculateWPM();
+                    alert("Time's up! Your typing test is over.");
+                }
             }
         }
 
         function calculateWPM() {
             let minutes = 1;
-            let wpm = wordsTyped / minutes;
+            let wpm = Math.round(wordsTyped / minutes);
             let accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 0;
 
-            wpmDisplay.textContent = Math.round(wpm);
+            wpmDisplay.textContent = wpm;
             accuracyDisplay.textContent = accuracy;
 
-            if (wpm > highScore) {
-                highScore = Math.round(wpm);
-                localStorage.setItem("highScore", highScore);
-                highScoreDisplay.textContent = highScore;
+            if (wpm > typingHighScore) {
+                typingHighScore = wpm;
+                localStorage.setItem("typingHighScore", typingHighScore);
+                document.getElementById("typingHighScore").textContent = typingHighScore;
             }
         }
 
         textInput.addEventListener("input", function () {
-            let currentText = textInput.value;
-            let expectedText = wordDisplay.textContent;
-
-            totalChars = expectedText.length;
-            correctChars = 0;
-
-            for (let i = 0; i < currentText.length; i++) {
-                if (currentText[i] === expectedText[i]) {
-                    correctChars++;
-                }
-            }
-
-            if (currentText === expectedText) {
-                wordsTyped += expectedText.split(" ").length;
-                wordsTypedDisplay.textContent = wordsTyped;
-                textInput.value = "";
-                wordDisplay.textContent = getRandomSentence();
-            }
-        });
-
-        textInput.addEventListener("keypress", function (event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                wordsTyped += wordDisplay.textContent.split(" ").length;
-                wordsTypedDisplay.textContent = wordsTyped;
-                textInput.value = "";
-                wordDisplay.textContent = getRandomSentence();
-            }
+            let typedWords = textInput.value.trim().split(/\s+/).length;
+            wordsTyped = typedWords;
+            wordsTypedDisplay.textContent = wordsTyped;
         });
 
         startButton.addEventListener("click", startGame);
+        pauseButton.addEventListener("click", pauseGame);
+        restartButton.addEventListener("click", restartGame);
     </script>
 </body>
 </html>

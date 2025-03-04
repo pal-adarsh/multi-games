@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Neon Login</title>
 
     <!-- Bootstrap 4 CDN -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
@@ -12,92 +12,121 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
 
     <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Custom Styles */
+        /* Neon Cyberpunk Styles */
         * {
-            font-family: 'Poppins', sans-serif;
-        }
+    font-family: 'Orbitron', sans-serif;
+}
 
-        body {
-            background: url('img.jpg') no-repeat center center/cover;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+body {
+    background: url(background.jpeg) no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Animated Background Grid */
+/* body::before {
+    content: "seg";
+    position: absolute;
+    width: 300%;
+    height: 300%;
+    background: url('https://i.imgur.com/IWl4Zt4.png');
+    opacity: 0.2;
+    z-index: -1;
+    animation: moveBackground 10s linear infinite;
+}
+
+@keyframes moveBackground {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(-50px, -50px); }
+    100% { transform: translate(0, 0); }
+} */
 
         .card {
             width: 400px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
+            background: rgba(0, 0, 0, 0.8);
+            color: cyan;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 15px cyan;
+            text-align: center;
+            padding: 20px;
         }
 
         .card-header h3 {
-            text-align: center;
-            font-weight: 600;
+            font-weight: 700;
+            text-shadow: 0 0 10px cyan, 0 0 20px cyan;
         }
 
         .social_icon {
-            text-align: center;
-            margin-top: -30px;
+            margin-bottom: 15px;
         }
 
         .social_icon a {
             font-size: 25px;
             margin: 0 10px;
-            color: #ffcccc;
+            color: cyan;
             transition: 0.3s ease;
         }
 
         .social_icon a:hover {
-            color: white;
+            color: magenta;
             transform: scale(1.1);
         }
 
         .input-group-text {
-            background: #ffcccc;
-            color: black;
+            background: transparent;
             border: none;
+            color: cyan;
+            box-shadow: 0 0 10px cyan;
         }
 
         input {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
+            background: transparent;
+            color: cyan;
+            border: 1px solid cyan;
             padding: 10px;
+            border-radius: 5px;
+            text-align: center;
         }
 
         input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(0, 255, 255, 0.5);
         }
 
         input:focus {
-            background: rgba(255, 255, 255, 0.3);
+            background: transparent;
             outline: none;
+            border: 1px solid magenta;
+            box-shadow: 0 0 15px magenta;
         }
 
         .remember {
             font-size: 14px;
+            color: cyan;
         }
 
         .login_btn {
-            background: #ffcccc;
-            color: black;
-            font-weight: 600;
+            background: transparent;
+            color: cyan;
+            font-weight: 700;
             width: 100%;
             padding: 10px;
-            border: none;
+            border: 2px solid cyan;
             border-radius: 5px;
             transition: 0.3s ease;
+            box-shadow: 0 0 15px cyan;
         }
 
         .login_btn:hover {
-            background: white;
+            background: magenta;
             color: black;
+            box-shadow: 0 0 20px magenta;
         }
 
         .links {
@@ -106,13 +135,14 @@
         }
 
         .links a {
-            color: #ffcccc;
+            color: cyan;
             text-decoration: none;
             transition: 0.3s;
         }
 
         .links a:hover {
-            text-decoration: underline;
+            color: magenta;
+            text-shadow: 0 0 10px magenta;
         }
 
         /* Mobile Optimization */
@@ -125,7 +155,7 @@
 </head>
 <body>
 
-    <div class="card p-4">
+    <div class="card">
         <div class="card-header">
             <h3>Sign In</h3>
         </div>
@@ -156,8 +186,8 @@
                     <input type="checkbox" class="form-check-input" id="rememberMe">
                     <label class="form-check-label remember" for="rememberMe">Remember Me</label>
                 </div>
-              <a href="/Home page/index2.html"><button type="submit" class="login_btn">Login</button>
-              </a>
+
+                <button type="submit" class="login_btn">Login</button>
             </form>
         </div>
 

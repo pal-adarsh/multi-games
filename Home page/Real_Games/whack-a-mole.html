@@ -80,6 +80,7 @@
             border-radius: 5px;
             box-shadow: 0 0 15px cyan;
             transition: 0.3s;
+            margin: 5px;
         }
 
         button:hover {
@@ -91,7 +92,7 @@
 <body>
     <h1>Neon Whack-a-Mole!</h1>
     <p>Score: <span id="score">0</span></p>
-    <p>High Score: <span id="high-score">0</span></p>
+    <p>High Score: <span id="whackHighScore">0</span></p>
     <p>Time Left: <span id="time-left">30</span> sec</p>
 
     <div class="grid">
@@ -105,25 +106,32 @@
         <div class="hole" id="8"></div>
         <div class="hole" id="9"></div>
     </div>
-
-    <button id="start-button">Start Game</button>
+    <br><br>
+    <a href="../index2.html"><button>Home</button></a>
+    <button id="start-button">Start</button>
+    <button id="pause-button">Pause</button>
+    <button id="restart-button">Restart</button>
 
     <script>
         let score = 0;
         let timeLeft = 30;
         let moleTimer, gameTimer;
-        let highScore2 = localStorage.getItem("highScore2") || 0; // Get stored high score
+        let isPaused = false;
+        let whackHighScore = localStorage.getItem("whackHighScore") || 0;
 
         const scoreDisplay = document.getElementById("score");
-        const highScore2Display = document.getElementById("high-score");
+        const highScoreDisplay = document.getElementById("whackHighScore");
         const timeDisplay = document.getElementById("time-left");
         const holes = document.querySelectorAll(".hole");
         const startButton = document.getElementById("start-button");
+        const pauseButton = document.getElementById("pause-button");
+        const restartButton = document.getElementById("restart-button");
 
-        highScore2Display.textContent = highScore2; // Display stored high score
+        highScoreDisplay.textContent = whackHighScore; 
 
         function randomMole() {
-            holes.forEach(hole => hole.innerHTML = ""); // Clear all moles
+            if (isPaused) return;
+            holes.forEach(hole => hole.innerHTML = ""); 
             let randomHole = holes[Math.floor(Math.random() * holes.length)];
             let mole = document.createElement("div");
             mole.classList.add("mole");
@@ -131,45 +139,84 @@
             randomHole.appendChild(mole);
 
             setTimeout(() => {
-                mole.remove();
+                if (!isPaused) mole.remove();
             }, Math.random() * 500 + 500);
         }
 
         function hitMole() {
+            if (isPaused) return;
             score++;
             scoreDisplay.textContent = score;
             this.parentNode.innerHTML = "";
         }
 
         function startGame() {
+            if (gameTimer) return;
+
             score = 0;
             timeLeft = 30;
             scoreDisplay.textContent = score;
             timeDisplay.textContent = timeLeft;
+            isPaused = false;
 
             moleTimer = setInterval(randomMole, 700);
             gameTimer = setInterval(() => {
-                timeLeft--;
-                timeDisplay.textContent = timeLeft;
-
-                if (timeLeft <= 0) {
-                    clearInterval(moleTimer);
-                    clearInterval(gameTimer);
-
-                    // Check and update high score
-                    if (score > highScore2) {
-                        highScore2 = score;
-                        localStorage.setItem("highScore2", highScore2); // Store new high score
-                        highScore2Display.textContent = highScore2;
-                        alert(`🎉 New High Score! Your Score: ${score}`);
-                    } else {
-                        alert(`Game over! Your final score is: ${score}`);
-                    }
+                if (!isPaused) {
+                    timeLeft--;
+                    timeDisplay.textContent = timeLeft;
+                    if (timeLeft <= 0) endGame();
                 }
             }, 1000);
         }
 
+        function pauseGame() {
+            isPaused = !isPaused;
+            pauseButton.innerText = isPaused ? "Resume" : "Pause";
+
+            if (isPaused) {
+                clearInterval(moleTimer);
+                clearInterval(gameTimer);
+            } else {
+                moleTimer = setInterval(randomMole, 700);
+                gameTimer = setInterval(() => {
+                    if (!isPaused) {
+                        timeLeft--;
+                        timeDisplay.textContent = timeLeft;
+                        if (timeLeft <= 0) endGame();
+                    }
+                }, 1000);
+            }
+        }
+
+        function endGame() {
+            clearInterval(moleTimer);
+            clearInterval(gameTimer);
+            gameTimer = null;
+
+            if (score > whackHighScore) {
+                whackHighScore = score;
+                localStorage.setItem("whackHighScore", whackHighScore);
+                highScoreDisplay.textContent = whackHighScore;
+                alert(`🎉 New High Score! Your Score: ${score}`);
+            } else {
+                alert(`Game over! Your final score is: ${score}`);
+            }
+        }
+
+        function restartGame() {
+            clearInterval(moleTimer);
+            clearInterval(gameTimer);
+            gameTimer = null;
+            score = 0;
+            timeLeft = 30;
+            scoreDisplay.textContent = score;
+            timeDisplay.textContent = timeLeft;
+            holes.forEach(hole => hole.innerHTML = "");
+        }
+
         startButton.addEventListener("click", startGame);
+        pauseButton.addEventListener("click", pauseGame);
+        restartButton.addEventListener("click", restartGame);
     </script>
 </body>
 </html>

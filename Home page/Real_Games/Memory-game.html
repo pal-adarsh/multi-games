@@ -82,7 +82,7 @@
             transition: transform 0.5s ease;
         }
 
-        .card.flipped .card-inner {
+        .flipped .card-inner {
             transform: rotateY(180deg);
         }
 
@@ -124,10 +124,11 @@
     <div class="game-container">
         <h1>Neon Memory Game</h1>
         <div class="info">
+            <a href="../index2.html"><button>Home</button></a>
             <button id="start-btn">Start Game</button>
             <button id="restart-btn" disabled>Restart</button>
             <button id="pause-btn" disabled>Pause</button>
-            <!-- <p>Time: <span id="timer">00:00</span></p> -->
+            <p>Time: <span id="timer">00:00</span></p>
             <p>Moves: <span id="move-counter">0</span></p>
             <p class="best-score">Best Time: <span id="best-time">--:--</span> | Best Moves: <span id="best-moves">--</span></p>
         </div>
@@ -145,9 +146,9 @@
             const bestTimeDisplay = document.getElementById('best-time');
             const bestMovesDisplay = document.getElementById('best-moves');
 
-            let firstCard = null, secondCard = null;
+            let firstCard, secondCard;
             let lockBoard = false;
-            let matchedCount = 0;
+            let matchedPairs = 0;
             let moveCount = 0;
             let timer;
             let seconds = 0;
@@ -160,41 +161,38 @@
             }
 
             function updateBestScore() {
-                const currentMoves = moveCount;
                 const storedMoves = parseInt(localStorage.getItem('bestMoves')) || Infinity;
-
-                if (currentMoves < storedMoves) {
+                if (moveCount < storedMoves) {
                     localStorage.setItem('bestTime', timerDisplay.textContent);
-                    localStorage.setItem('bestMoves', currentMoves);
+                    localStorage.setItem('bestMoves', moveCount);
                     loadBestScore();
                 }
             }
 
             function generateCards() {
-                let cardNumbers = Array.from({ length: 8 }, (_, i) => (i + 1).toString()).flatMap(x => [x, x]);
-                cardNumbers.sort(() => Math.random() - 0.5);
-                return cardNumbers;
+                let cardValues = Array.from({ length: 8 }, (_, i) => (i + 1).toString()).flatMap(x => [x, x]);
+                cardValues.sort(() => Math.random() - 0.5);
+                return cardValues;
             }
 
             function renderBoard() {
                 const cards = generateCards();
                 board.innerHTML = '';
-                matchedCount = 0;
+                matchedPairs = 0;
                 moveCount = 0;
                 moveCounterDisplay.textContent = moveCount;
-                firstCard = null;
-                secondCard = null;
+                firstCard = secondCard = null;
                 lockBoard = false;
 
-                cards.forEach((cardValue) => {
+                cards.forEach((value) => {
                     const card = document.createElement('div');
                     card.classList.add('card');
-                    card.dataset.card = cardValue;
+                    card.dataset.card = value;
 
                     card.innerHTML = `
                         <div class="card-inner">
                             <div class="front"></div>
-                            <div class="back">${cardValue}</div>
+                            <div class="back">${value}</div>
                         </div>
                     `;
 
@@ -232,8 +230,11 @@
                 lockBoard = true;
                 setTimeout(() => {
                     if (firstCard.dataset.card === secondCard.dataset.card) {
-                        matchedCount++;
-                        if (matchedCount === 8) updateBestScore();
+                        matchedPairs++;
+                        if (matchedPairs === 8) {
+                            clearInterval(timer);
+                            updateBestScore();
+                        }
                     } else {
                         firstCard.classList.remove('flipped');
                         secondCard.classList.remove('flipped');
@@ -252,6 +253,8 @@
                 pauseButton.disabled = false;
             });
 
+            restartButton.addEventListener('click', renderBoard);
+            pauseButton.addEventListener('click', () => isPaused = !isPaused);
             loadBestScore();
         });
     </script>
